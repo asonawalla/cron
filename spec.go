@@ -1,6 +1,9 @@
 package cron
 
-import "time"
+import (
+	"math/rand"
+	"time"
+)
 
 // SpecSchedule specifies a duty cycle (to the second granularity), based on a
 // traditional crontab specification. It is computed initially and stored as bit sets.
@@ -12,6 +15,11 @@ type SpecSchedule struct {
 type bounds struct {
 	min, max uint
 	names    map[string]uint
+}
+
+// rand returns a value between the min and max bounds
+func (b bounds) rand() uint {
+	return uint(rand.Intn(int(b.max-b.min))) + b.min
 }
 
 // The bounds for each field.
@@ -155,4 +163,8 @@ func dayMatches(s *SpecSchedule, t time.Time) bool {
 		return domMatch && dowMatch
 	}
 	return domMatch || dowMatch
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }

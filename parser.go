@@ -326,12 +326,32 @@ func parseDescriptor(descriptor string) (Schedule, error) {
 			Dow:    all(dow),
 		}, nil
 
+	case "@yearly-rand", "@annually-rand":
+		return &SpecSchedule{
+			Second: 1 << seconds.rand(),
+			Minute: 1 << minutes.rand(),
+			Hour:   1 << hours.rand(),
+			Dom:    1 << dom.rand(),
+			Month:  1 << months.rand(),
+			Dow:    all(dow),
+		}, nil
+
 	case "@monthly":
 		return &SpecSchedule{
 			Second: 1 << seconds.min,
 			Minute: 1 << minutes.min,
 			Hour:   1 << hours.min,
 			Dom:    1 << dom.min,
+			Month:  all(months),
+			Dow:    all(dow),
+		}, nil
+
+	case "@monthly-rand":
+		return &SpecSchedule{
+			Second: 1 << seconds.rand(),
+			Minute: 1 << minutes.rand(),
+			Hour:   1 << hours.rand(),
+			Dom:    1 << dom.rand(),
 			Month:  all(months),
 			Dow:    all(dow),
 		}, nil
@@ -346,6 +366,16 @@ func parseDescriptor(descriptor string) (Schedule, error) {
 			Dow:    1 << dow.min,
 		}, nil
 
+	case "@weekly-rand":
+		return &SpecSchedule{
+			Second: 1 << seconds.rand(),
+			Minute: 1 << minutes.rand(),
+			Hour:   1 << hours.rand(),
+			Dom:    all(dom),
+			Month:  all(months),
+			Dow:    1 << dow.rand(),
+		}, nil
+
 	case "@daily", "@midnight":
 		return &SpecSchedule{
 			Second: 1 << seconds.min,
@@ -356,10 +386,30 @@ func parseDescriptor(descriptor string) (Schedule, error) {
 			Dow:    all(dow),
 		}, nil
 
+	case "@daily-rand":
+		return &SpecSchedule{
+			Second: 1 << seconds.rand(),
+			Minute: 1 << minutes.rand(),
+			Hour:   1 << hours.rand(),
+			Dom:    all(dom),
+			Month:  all(months),
+			Dow:    all(dow),
+		}, nil
+
 	case "@hourly":
 		return &SpecSchedule{
 			Second: 1 << seconds.min,
 			Minute: 1 << minutes.min,
+			Hour:   all(hours),
+			Dom:    all(dom),
+			Month:  all(months),
+			Dow:    all(dow),
+		}, nil
+
+	case "@hourly-rand":
+		return &SpecSchedule{
+			Second: 1 << seconds.rand(),
+			Minute: 1 << minutes.rand(),
 			Hour:   all(hours),
 			Dom:    all(dom),
 			Month:  all(months),

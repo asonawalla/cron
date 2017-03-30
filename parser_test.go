@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -181,6 +182,85 @@ func TestParse(t *testing.T) {
 		},
 	}
 
+	for _, c := range entries {
+		actual, err := Parse(c.expr)
+		if len(c.err) != 0 && (err == nil || !strings.Contains(err.Error(), c.err)) {
+			t.Errorf("%s => expected %v, got %v", c.expr, c.err, err)
+		}
+		if len(c.err) == 0 && err != nil {
+			t.Errorf("%s => unexpected error %v", c.expr, err)
+		}
+		if !reflect.DeepEqual(actual, c.expected) {
+			t.Errorf("%s => expected %b, got %b", c.expr, c.expected, actual)
+		}
+	}
+}
+
+func TestParseRand(t *testing.T) {
+	rand.Seed(1)
+	entries := []struct {
+		expr     string
+		expected Schedule
+		err      string
+	}{
+		{
+			expr: "@yearly-rand",
+			expected: &SpecSchedule{
+				Second: 1 << seconds.rand(),
+				Minute: 1 << minutes.rand(),
+				Hour:   1 << hours.rand(),
+				Dom:    1 << dom.rand(),
+				Month:  1 << months.rand(),
+				Dow:    all(dow),
+			},
+		},
+		{
+			expr: "@annually-rand",
+			expected: &SpecSchedule{
+				Second: 1 << seconds.rand(),
+				Minute: 1 << minutes.rand(),
+				Hour:   1 << hours.rand(),
+				Dom:    1 << dom.rand(),
+				Month:  1 << months.rand(),
+				Dow:    all(dow),
+			},
+		},
+		{
+			expr: "@monthly-rand",
+			expected: &SpecSchedule{
+				Second: 1 << seconds.rand(),
+				Minute: 1 << minutes.rand(),
+				Hour:   1 << hours.rand(),
+				Dom:    1 << dom.rand(),
+				Month:  all(months),
+				Dow:    all(dow),
+			},
+		},
+		{
+			expr: "@weekly-rand",
+			expected: &SpecSchedule{
+				Second: 1 << seconds.rand(),
+				Minute: 1 << minutes.rand(),
+				Hour:   1 << hours.rand(),
+				Dom:    all(dom),
+				Month:  all(months),
+				Dow:    1 << dow.rand(),
+			},
+		},
+		{
+			expr: "@daily-rand",
+			expected: &SpecSchedule{
+				Second: 1 << seconds.rand(),
+				Minute: 1 << minutes.rand(),
+				Hour:   1 << hours.rand(),
+				Dom:    all(dom),
+				Month:  all(months),
+				Dow:    all(dow),
+			},
+		},
+	}
+
+	rand.Seed(1)
 	for _, c := range entries {
 		actual, err := Parse(c.expr)
 		if len(c.err) != 0 && (err == nil || !strings.Contains(err.Error(), c.err)) {
